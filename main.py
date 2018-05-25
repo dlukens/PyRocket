@@ -1,8 +1,7 @@
-import math, sys, random
+import math, sys, random, pygame
+from pygame.locals import *
 
-import labels, interface, control, objects
-
-import numpy as np
+import labels, control, objects, display
 
 import pygame
 from pygame.locals import *
@@ -14,8 +13,6 @@ except:
     print("Run pip install pymunk")
     quit()
 
-import pymunk.pygame_util
-
 # ---Set-up---
 pygame.init()
 screenx = 1000
@@ -26,14 +23,13 @@ running = True
 
 launch = False
 
+time = 0
+
 # ---Space---
 space = pymunk.Space()
-
 draw_options = pymunk.pygame_util.DrawOptions(screen)
 
 gravity = 900
-
-ceiling = 240000
 
 # ---Ground---
 ground_h = 200
@@ -61,12 +57,14 @@ rocket, leg1, leg2, ground, joint1, joint2 = objects.begin(
 
 # ---Main Loop---
 while running:
-    for event in pygame.event.get():                                            # Exit program
+    for event in pygame.event.get():
         if event.type == QUIT:
             running = False
         elif event.type == KEYDOWN and event.key == K_ESCAPE:
             running = False
 
+
+    # ---Control---
     rocket_pos, rocket_mass, angle = control.camera(
         rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ground_w)
 
@@ -74,30 +72,13 @@ while running:
         rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, launch, angle, rocket)
 
     # ---Screen display---
-    sky_color_ground = np.array([87, 197, 241])
-    sky_color_space = np.array([10, 1, 46])
-
-    sky_color_diff = sky_color_ground - sky_color_space
-
-    # function to exponentially change bg color
-    color_step = sky_color_diff * \
-        (math.exp(rocket_pos[1] * math.log(2) / ceiling) - 1)
-
-    bg_color = abs(sky_color_ground - color_step)
-
-    screen.fill(bg_color)
-
-    space.debug_draw(draw_options)
+    display.graphics(rocket_pos, screen, space, draw_options, screeny, ground_img, ground)
 
     # ground image
-    if rocket_pos[1] < screeny / 2:  # prevent weird repeating pattern
-        for len in range(0, ground_w, 1400):
-            screen.blit(ground_img, pymunk.pygame_util.to_pygame((ground.body._get_position()[0]
-                                        + len, ground.body._get_position()[1] + ground_h), screen))
 
-    interface.GUI(screen, ground_w, ceiling, screenx, rocket_pos)
+    display.GUI(screen, ground_w, screenx, rocket_pos)
 
-    labels.text(screen, rocket.body, ground.body, rocket_pos, thrust, gravity)
+    labels.text(screen, rocket.body, ground.body, rocket_pos, thrust, gravity, time)
 
     # Flip screen
     pygame.display.update()
@@ -106,4 +87,6 @@ while running:
 
     # ---Physics---
     dt = 1 / 60.0
+    time += dt
+
     space.step(dt)

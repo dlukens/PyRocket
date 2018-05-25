@@ -1,6 +1,5 @@
-import pygame
-import pymunk
-import math
+import pygame, pymunk, math
+
 from pygame.locals import *
 
 
