@@ -1,8 +1,5 @@
 import math, sys, random
 
-#Testing github!
-
-
 import Labels
 
 import numpy as np
