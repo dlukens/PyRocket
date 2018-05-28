@@ -1,11 +1,13 @@
-import math, sys, random, pygame
-from pygame.locals import *
-
-import labels, control, objects, display
-
+import math
+import sys
+import random
 import pygame
 from pygame.locals import *
-from pygame.color import *
+
+import labels
+import control
+import objects
+import display
 
 try:
     import pymunk
@@ -13,7 +15,7 @@ except:
     print("Run pip install pymunk")
     quit()
 
-# ---Set-up---
+# ---Setup---
 pygame.init()
 screenx = 1000
 screeny = 700
@@ -29,6 +31,8 @@ time = 0
 space = pymunk.Space()
 draw_options = pymunk.pygame_util.DrawOptions(screen)
 
+ceiling = 220000
+
 gravity = 900
 
 # ---Ground---
@@ -39,17 +43,16 @@ ground_img = pygame.image.load('data/grass.jpg').convert_alpha()
 ground_img = pygame.transform.scale(ground_img, (200, ground_h))
 
 # ---Rocket---
-rocket_fuel_mass = 400000
-rocket_empty_mass = 140000
+rocket_fuel_mass = 800000
+rocket_empty_mass = 150000
 
 rocket_mass = rocket_empty_mass + rocket_fuel_mass
 
-engine_isp = 330
-engine_massflow = 110
+engine_isp = 400
+engine_massflow = 80
 
-thrust = engine_isp * engine_massflow * gravity * 14
-force_rcs = 2e7
-
+thrust = engine_isp * engine_massflow * gravity * 30
+force_rcs = 6e7
 
 rocket, leg1, leg2, ground, joint1, joint2 = objects.begin(
     space, rocket_mass, screenx, ground_h, ground_w)
@@ -63,22 +66,25 @@ while running:
         elif event.type == KEYDOWN and event.key == K_ESCAPE:
             running = False
 
+    if launch:
+        time += dt
 
     # ---Control---
-    rocket_pos, rocket_mass, angle = control.camera(
-        rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ground_w)
+    rocket_pos, rocket_mass, angle, air_density = control.camera(
+        rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling)
 
     launch, rocket_fuel_mass = control.keys(
-        rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, launch, angle, rocket)
+        space, rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, launch, angle, rocket, joint1, joint2, leg1, leg2)
 
-    # ---Screen display---
-    display.graphics(rocket_pos, screen, space, draw_options, screeny, ground_img, ground)
+    # ---Screen business---
 
-    # ground image
+    display.graphics(rocket_pos, screen, space, draw_options,
+                     screeny, ground_img, ground, rocket, ceiling)
 
-    display.GUI(screen, ground_w, screenx, rocket_pos)
+    display.GUI(screen, ground, screenx, rocket_pos, ceiling)
 
-    labels.text(screen, rocket.body, ground.body, rocket_pos, thrust, gravity, time)
+    labels.text(screen, rocket, ground, rocket_pos,
+                thrust, gravity, time, air_density)
 
     # Flip screen
     pygame.display.update()
@@ -87,6 +93,5 @@ while running:
 
     # ---Physics---
     dt = 1 / 60.0
-    time += dt
 
     space.step(dt)
