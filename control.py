@@ -5,7 +5,7 @@ import ISAcalcmod, objects
 from pygame.locals import *
 
 
-def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling):
+def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling, screenx):
     rocket.body.velocity = (0, 0)
     angle = pymunk.Body._get_angle(rocket.body)
 
@@ -20,7 +20,7 @@ def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling
     pymunk.Body._set_mass(ground.body, rocket_mass)
 
     rocket_pos = -(pymunk.Body._get_position(ground.body)
-                   [0] + ground.w / 2)/10, -(pymunk.Body._get_position(ground.body)[1] - 30)/10
+                   [0] - screenx/2), -(pymunk.Body._get_position(ground.body)[1] - 30)
 
     #drag
     air_density = ISAcalcmod.CALC((rocket_pos[1]*86000)/(ceiling*10))
@@ -56,9 +56,6 @@ def keys(space, rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, la
 
         joint1.rotary._set_rest_angle(math.pi/4 * 3)
         joint2.rotary._set_rest_angle(-math.pi/4 * 3)
-
-
-
 
 
     return(launch, rocket_fuel_mass)
