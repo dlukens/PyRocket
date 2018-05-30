@@ -32,6 +32,12 @@ time = 0
 space = pymunk.Space()
 draw_options = pymunk.pygame_util.DrawOptions(screen)
 
+# space.collision_bias = 0.1
+# space.collision_slop = 0.1
+
+print(space.collision_slop)
+
+
 ceiling = 100000
 
 gravity = 900
@@ -60,7 +66,7 @@ thrust = engine_isp * engine_massflow * gravity * 30
 force_rcs = 2e8
 
 rocket, leg1, leg2, ground, joint1, joint2 = objects.begin(
-    space, rocket_mass, screenx, ground_h, ground_w, rocket_start_pos)
+    space, rocket_mass, screenx,screeny, ground_h, ground_w, rocket_start_pos)
 
 
 # ---Main Loop---
@@ -82,7 +88,7 @@ while running:
     launch, rocket_fuel_mass = control.keys(
         space, rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, launch, angle, rocket, joint1, joint2, leg1, leg2)
 
-    game.logic(rocket, ground, rocket_pos, lz_offset, space)
+    landed = game.logic(rocket, ground, rocket_pos, lz_offset, space, angle)
 
 
     # ---Screen business---
@@ -93,7 +99,7 @@ while running:
     display.GUI(screen, ground, screenx, rocket_pos, ceiling, rocket_start_pos, lz_offset)
 
     labels.text(screen, rocket, ground, rocket_pos,
-                thrust, gravity, time, air_density, rocket_start_pos)
+                thrust, gravity, time, air_density, rocket_start_pos, landed)
 
     # Flip screen
     pygame.display.update()

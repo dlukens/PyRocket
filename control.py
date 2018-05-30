@@ -6,13 +6,9 @@ from pygame.locals import *
 
 
 def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling, screenx):
-    rocket.body.velocity = (0, 0)
     angle = pymunk.Body._get_angle(rocket.body)
 
-    if pymunk.Body._get_position(ground.body)[1] < 30:  # Avoid weird floating
-        ground.body.apply_force_at_local_point(
-            (0, ground.body._get_mass() * gravity), (0, 0))
-
+    ground.body.apply_force_at_local_point((0, ground.body._get_mass() * gravity), (0, 0))
 
     # Miscellaneous
     rocket_mass = rocket_empty_mass + rocket_fuel_mass

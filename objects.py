@@ -4,7 +4,7 @@ from pygame.color import *
 rocket_h = 44
 rocket_w = 5
 
-def begin(space, rocket_mass, screenx, ground_h, ground_w, rocket_start_pos):
+def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start_pos):
     class bodies():
         def __init__(self, w, h, mass, posx, posy, color, id):
             self.posx = posx
@@ -12,8 +12,6 @@ def begin(space, rocket_mass, screenx, ground_h, ground_w, rocket_start_pos):
 
             self.w = w
             self.h = h
-
-
 
             vertices = [(0, 0), (w, 0), (w, h), (0, h)]
 
@@ -34,7 +32,6 @@ def begin(space, rocket_mass, screenx, ground_h, ground_w, rocket_start_pos):
     leg1 = bodies(5, 42, 10000, rocket.posx - rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['red'], 1)
     leg2 = bodies(5, 42, 10000, rocket.posx + rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['pink'], 1)
 
-
     ground = bodies(ground_w, ground_h, rocket_mass, -rocket_start_pos + ground_w / 2, 0, THECOLORS['red'], 2)
     ground.body._set_moment(pymunk.inf)
 
@@ -44,7 +41,7 @@ def begin(space, rocket_mass, screenx, ground_h, ground_w, rocket_start_pos):
 
             self.pin = pymunk.constraint.PivotJoint(rocket.body, leg.body, pin_coord, (leg.w/2, 0))
 
-            self.rotary = pymunk.constraint.DampedRotarySpring(leg.body, rocket.body, rotary_angle0, 2e11, 1e9)
+            self.rotary = pymunk.constraint.DampedRotarySpring(leg.body, rocket.body, rotary_angle0, 9e10, 6e9)
             self.rotary.collide_bodies = False
 
             self.limit = pymunk.constraint.RotaryLimitJoint(leg.body, rocket.body, limit_angle0,  limit_angle1)
@@ -53,6 +50,9 @@ def begin(space, rocket_mass, screenx, ground_h, ground_w, rocket_start_pos):
 
     joint1 = joints(leg1, (rocket.w/4, 6), 0, -math.pi/4 * 3, 0)
     joint2 = joints(leg2, (rocket.w/4 * 3, 6), 0, 0, math.pi/4 * 3)
+
+    rocket_joint = pymunk.constraint.PivotJoint(rocket.body, space.static_body, (rocket.w /2, rocket.h / 2), (screenx / 2, screeny / 2 - 100))
+    space.add(rocket_joint)
 
 
     return(rocket, leg1, leg2, ground, joint1, joint2)
