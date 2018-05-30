@@ -2,7 +2,7 @@ import pygame
 
 dt = 1 / 60.0
 
-def text(screen, rocket, ground, rocket_pos, thrust, gravity, time, air_density, rocket_start_pos):
+def text(screen, rocket, ground, rocket_pos, thrust, gravity, time, air_density, rocket_start_pos, landed):
     myfont = pygame.font.SysFont("monospace", 20)
     label = myfont.render('Fuel left: ' + str(rocket.body._get_mass()) + 'kg', 1, (0, 0, 0))
     label_x = myfont.render('x: {} m'.format(str(round(rocket_pos[0], 2))), 1, (0, 0, 0))
@@ -12,6 +12,7 @@ def text(screen, rocket, ground, rocket_pos, thrust, gravity, time, air_density,
     label_rocket_speed_y = myfont.render('Y Speed: ' + str(round(-ground.body._get_velocity()[1]/100, 0)), 1, (0, 0, 0))
     label_time = myfont.render('t+: {}s'.format(round(time, 1)), 1, (0, 0, 0))
     label_air_density = myfont.render('Air density: {}kg/m^3'.format(round(air_density, 4)), 1, (0, 0, 0))
+    label_landed = myfont.render('Landed: {}'.format(landed), 1, (0, 0, 0))
 
 
     screen.blit(label, (10, 20))
@@ -22,3 +23,4 @@ def text(screen, rocket, ground, rocket_pos, thrust, gravity, time, air_density,
     screen.blit(label_rocket_speed_y, (10, 120))
     screen.blit(label_time, (10, 140))
     screen.blit(label_air_density, (10, 160))
+    screen.blit(label_landed, (10, 180))
