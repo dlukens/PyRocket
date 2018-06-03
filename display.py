@@ -4,7 +4,7 @@ import pymunk.pygame_util
 import numpy as np
 
 
-def GUI(screen, ground, screenx, rocket_pos, ceiling, rocket_start_pos, lz_offset):
+def GUI(screen, ground, screenx, rocket_pos, ceiling, rocket_start_pos, lz_offset, angle, air_speed_angle, drag_angle):
     global time
     # minimap
     size = 160
@@ -34,8 +34,16 @@ def GUI(screen, ground, screenx, rocket_pos, ceiling, rocket_start_pos, lz_offse
     screen.blit(minimap, (screenx - size - 10, 10))
 
     #compass
+    pygame.draw.circle(screen, (200, 100, 0), [500, 450], 180, 1)
 
-    pygame.draw.circle(screen, (255, 0, 0), [500, 450], 180, 1)
+    compass_heading_pos = [round(screenx/2 + 200 * math.sin(-angle)), round(450 - 200 * math.cos(angle))]
+    pygame.draw.circle(screen, (250, 120, 200), compass_heading_pos, 5)
+
+    compass_airspeed_pos = [round(screenx/2 + 200 * math.sin(air_speed_angle)), round(450 - 200 * math.cos(air_speed_angle))]
+    pygame.draw.circle(screen, (200, 50, 200), compass_airspeed_pos, 5)
+
+    compass_drag_pos = [round(screenx/2 - 200 * math.cos(drag_angle)), round(450 - 200 * math.sin(drag_angle))]
+    pygame.draw.circle(screen, (0, 0, 250), compass_drag_pos, 5)
 
 
 def graphics(rocket_pos, screen, space, draw_options, screeny, ground_img, ground, rocket, ceiling, lz_offset):
@@ -65,3 +73,21 @@ def graphics(rocket_pos, screen, space, draw_options, screeny, ground_img, groun
     lz_size = 20000, 100
 
     pygame.draw.rect(screen, (255, 0, 200), (lz_pos[0], lz_pos[1], lz_size[0], lz_size[1] ))
+
+def splash(landed, boom, out_map, screen, screenx):
+    def splashy(type, color):
+        myfont = pygame.font.SysFont("monospace", 40)
+        pygame.draw.rect(screen, (color), (0, 200, screenx, 300))
+
+        label = myfont.render('{} Press R to restart.'.format(type), 2, (0, 0, 0))
+        screen.blit(label, (100, 300))
+
+
+    if landed:
+        splashy('You won!',(0, 255, 0))
+
+    if boom:
+        splashy('You exploded!',(255, 0, 0))
+
+    if out_map:
+        splashy('You left the map!',(255, 0, 100))

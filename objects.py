@@ -22,7 +22,7 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
             self.body._set_center_of_gravity([w/2, h/2])
 
             self.shape = pymunk.Poly(self.body, vertices)
-            self.shape._set_friction(0.45)
+            self.shape._set_friction(0.5)
             self.shape.color = color
             self.shape.id = id
 

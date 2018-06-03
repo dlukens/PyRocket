@@ -32,13 +32,7 @@ time = 0
 space = pymunk.Space()
 draw_options = pymunk.pygame_util.DrawOptions(screen)
 
-# space.collision_bias = 0.1
-# space.collision_slop = 0.1
-
-print(space.collision_slop)
-
-
-ceiling = 100000
+ceiling = 250000
 
 gravity = 900
 
@@ -52,17 +46,19 @@ ground_img = pygame.transform.scale(ground_img, (400, ground_h))
 lz_offset = 100000
 
 # ---Rocket---
-rocket_fuel_mass = 800000
+rocket_fuel_mass_init = 800000
+rocket_fuel_mass = rocket_fuel_mass_init
 rocket_empty_mass = 150000
 
-rocket_start_pos = ground_w/4  - screenx/2
+rocket_start_pos = ground_w/3
 
 rocket_mass = rocket_empty_mass + rocket_fuel_mass
 
-engine_isp = 400
+# engine_isp = 400
+engine_isp = 600
 engine_massflow = 80
 
-thrust = engine_isp * engine_massflow * gravity * 30
+
 force_rcs = 2e8
 
 rocket, leg1, leg2, ground, joint1, joint2 = objects.begin(
@@ -80,15 +76,18 @@ while running:
     if launch:
         time += dt
 
-    # ---Control---
-    rocket_pos, rocket_mass, angle, air_density = control.camera(
-        rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling, screenx)
+    thrust = engine_isp * engine_massflow * gravity * 30
 
+
+    # ---Control---
+    rocket_pos, rocket_mass, angle, air_density, air_speed_angle, drag_angle, gravity = control.camera(
+        rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling, screenx)
 
     launch, rocket_fuel_mass = control.keys(
         space, rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, launch, angle, rocket, joint1, joint2, leg1, leg2)
 
-    landed = game.logic(rocket, ground, rocket_pos, lz_offset, space, angle)
+    landed, landed_timer, boom, out_map = game.logic(rocket, ground, rocket_pos, lz_offset, space, angle, ceiling)
+    rocket_fuel_mass, launch, landed = game.restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_init ,rocket_fuel_mass, launch, screen, landed)
 
 
     # ---Screen business---
@@ -96,10 +95,12 @@ while running:
     display.graphics(rocket_pos, screen, space, draw_options,
                      screeny, ground_img, ground, rocket, ceiling, lz_offset)
 
-    display.GUI(screen, ground, screenx, rocket_pos, ceiling, rocket_start_pos, lz_offset)
+    display.GUI(screen, ground, screenx, rocket_pos, ceiling, rocket_start_pos, lz_offset, angle, air_speed_angle, drag_angle)
 
     labels.text(screen, rocket, ground, rocket_pos,
-                thrust, gravity, time, air_density, rocket_start_pos, landed)
+                thrust, gravity, time, air_density, rocket_start_pos, landed_timer)
+
+    display.splash(landed, boom, out_map, screen, screenx)
 
     # Flip screen
     pygame.display.update()
