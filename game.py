@@ -53,10 +53,12 @@ def logic(rocket, ground, rocket_pos, lz_offset, space, angle, ceiling):
 
     return landed, landed_timer, boom, out_map
 
-def restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_init, rocket_fuel_mass, launch, screen, landed):
+def restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_init, rocket_fuel_mass, screen, landed, gear):
     keys = pygame.key.get_pressed()
     if keys[K_r]:
         print('r')
+
+        gear = False
 
         ground.body.position = (-rocket_start_pos, -100)
         ground.body.velocity = (0, 0)
@@ -68,5 +70,5 @@ def restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_i
         joint2.rotary._set_rest_angle(0)
 
 
-        return rocket_fuel_mass_init, False, False
-    return rocket_fuel_mass, launch, landed
+        return rocket_fuel_mass_init, False, gear
+    return rocket_fuel_mass, landed, gear

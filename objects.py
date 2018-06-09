@@ -1,10 +1,10 @@
-import pygame, pymunk, math
+import pygame, pymunk, math, random, os
 from pygame.color import *
 
-rocket_h = 44
-rocket_w = 5
+rocket_h = 32
+rocket_w = 4
 
-def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start_pos):
+def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start_pos, screen):
     class bodies():
         def __init__(self, w, h, mass, posx, posy, color, id):
             self.posx = posx
@@ -29,10 +29,10 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
             space.add(self.body, self.shape)
 
     rocket = bodies(rocket_w*4, rocket_h*4, rocket_mass, screenx/2, ground_h + rocket_h, THECOLORS['blue'], 0)
-    leg1 = bodies(5, 42, 10000, rocket.posx - rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['red'], 1)
-    leg2 = bodies(5, 42, 10000, rocket.posx + rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['pink'], 1)
+    leg1 = bodies(4, 32, 10000, rocket.posx - rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['red'], 1)
+    leg2 = bodies(4, 32, 10000, rocket.posx + rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['pink'], 1)
 
-    ground = bodies(ground_w, ground_h, rocket_mass, -rocket_start_pos + ground_w / 2, 0, THECOLORS['red'], 2)
+    ground = bodies(ground_w, ground_h, rocket_mass, -rocket_start_pos + ground_w / 2, 100, THECOLORS['red'], 2)
     ground.body._set_moment(pymunk.inf)
 
 
@@ -41,7 +41,7 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
 
             self.pin = pymunk.constraint.PivotJoint(rocket.body, leg.body, pin_coord, (leg.w/2, 0))
 
-            self.rotary = pymunk.constraint.DampedRotarySpring(leg.body, rocket.body, rotary_angle0, 9e10, 6e9)
+            self.rotary = pymunk.constraint.DampedRotarySpring(leg.body, rocket.body, rotary_angle0, 8e9, 6e8)
             self.rotary.collide_bodies = False
 
             self.limit = pymunk.constraint.RotaryLimitJoint(leg.body, rocket.body, limit_angle0,  limit_angle1)
@@ -51,8 +51,42 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
     joint1 = joints(leg1, (rocket.w/4, 6), 0, -math.pi/4 * 3, 0)
     joint2 = joints(leg2, (rocket.w/4 * 3, 6), 0, 0, math.pi/4 * 3)
 
-    rocket_joint = pymunk.constraint.PivotJoint(rocket.body, space.static_body, (rocket.w /2, rocket.h / 2), (screenx / 2, screeny / 2 - 100))
+    rocket_joint = pymunk.constraint.PivotJoint(rocket.body, space.static_body, (rocket.w /2, rocket.h / 2), (screenx / 2, ground.h + rocket.w/2))
     space.add(rocket_joint)
 
+    class clouds():
+        def __init__(self, number):
+            layers = [8000, 12000, 20000, 32000, 50000, 80000, 120000, 200000]
+            self.number = number
 
-    return(rocket, leg1, leg2, ground, joint1, joint2)
+            self.list = []
+            self.imglist = []
+            load_img_list = []
+
+            self.max_len = 3000
+            self.max_he = 1200
+
+            for i in range(len(os.listdir('./data/clouds'))-1):
+                cloud_img = pygame.image.load('data/clouds/cloud{}.png'.format(i+1)).convert_alpha()
+                load_img_list.append(cloud_img)
+
+            for i in range(4):
+
+                cloud_size = random.randint(1500, self.max_len), random.randint(750, self.max_he)
+
+                self.imglist.append(random.choice(load_img_list))
+                self.imglist[i] = pygame.transform.scale(self.imglist[i], cloud_size)
+
+            for i in range(number):
+                rand_layer = random.randint(-2200,2500)
+                self.list.append((random.randint(0, ground.w), random.choice(layers) + rand_layer))
+                self.list[i] = pymunk.pygame_util.to_pygame(self.list[i], screen)
+
+                if len(self.imglist) < number:
+                    self.imglist.append(random.choice(self.imglist))
+
+
+    cloud = clouds(2000)
+
+
+    return(rocket, leg1, leg2, ground, joint1, joint2, rocket_joint, cloud)
