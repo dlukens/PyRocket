@@ -2,25 +2,48 @@ import pygame
 
 dt = 1 / 60.0
 
-def text(screen, rocket, ground, rocket_pos, thrust, gravity, air_density, rocket_start_pos, landed_timer, rocket_empty_mass):
+def text(screen, rocket, ground, rocket_pos, thrust, gravity, air_density, rocket_start_pos, landed_timer, rocket_empty_mass, screenx, screeny, time, last_time, best_time, above):
+    myfont_small = pygame.font.SysFont("monospace", 18)
     myfont = pygame.font.SysFont("monospace", 20)
-    label = myfont.render('Fuel left: ' + str(rocket.body._get_mass() - rocket_empty_mass) + 'kg', 2, (0, 0, 0))
-    label_x = myfont.render('x: {} m'.format(str(round(rocket_pos[0], 2))), 2, (0, 0, 0))
-    label_y = myfont.render('y: {} km'.format(str(round(rocket_pos[1]/10000, 2))), 2, (0, 0, 0))
-    label_TtW = myfont.render('T/W: ' + str(round(thrust/(rocket.body._get_mass()*gravity), 2)), 2, (0, 0, 0))
+    myfont_big = pygame.font.SysFont("monospace", 40)
+
+
+    label_fuel = myfont.render('Fuel left: ' + str(round(rocket.body._get_mass() - rocket_empty_mass)) + 'kg', 2, (0, 0, 0))
+    label_time2 = myfont_big.render('Time:', 2, (226, 192, 68))
+    label_time = myfont_big.render('Time:+{}s'.format(str(time)[:4]), 2, (0, 0, 0))
+    label_alt = myfont.render('Altitude: {}km'.format(str(round(rocket_pos[1]/10000, 2))), 2, (0, 0, 0))
+    label_TtW = myfont_small.render('T/W: ' + str(round(thrust/(rocket.body._get_mass()*gravity), 2)), 2, (0, 0, 0))
     label_rocket_speed_x = myfont.render('X Speed: ' + str(round(-ground.body._get_velocity()[0]/100, 0)), 2, (0, 0, 0))
     label_rocket_speed_y = myfont.render('Y Speed: ' + str(round(-ground.body._get_velocity()[1]/100, 0)), 2, (0, 0, 0))
-    label_air_density = myfont.render('Air density: {}kg/m^3'.format(round(air_density, 4)), 2, (0, 0, 0))
-    label_landed_timer = myfont.render('Landed: {}s'.format(landed_timer), 2, (0, 0, 0))
-    label_gravity = myfont.render('gravity: {}'.format(gravity), 2, (0, 0, 0))
+    label_air_density = myfont_small.render('Air density:{}kg/m^3'.format(round(air_density, 4)), 2, (0, 0, 0))
+    # label_landed_timer = myfont.render('Landed: {}s'.format(landed_timer), 2, (0, 0, 0))
+
+    label_info1 = myfont_small.render('Airspeed', 2, (0, 0, 0))
+    label_info2 = myfont_small.render('Heading', 2, (0, 0, 0))
+
+    label_last_time = myfont_small.render('Last:{}s'.format(round(float(last_time), 2)), 2, (0, 0, 0))
+    label_best_time = myfont_small.render('Best:{}s'.format(round(float(best_time), 2)), 2, (0, 0, 0))
+
+    label_above = myfont_small.render('You are above the target', 2, (0, 0, 0))
 
 
-    screen.blit(label, (10, 20))
-    screen.blit(label_x, (10, 40))
-    screen.blit(label_y, (10, 60))
-    screen.blit(label_TtW, (10, 80))
-    screen.blit(label_rocket_speed_x, (10, 100))
-    screen.blit(label_rocket_speed_y, (10, 120))
-    screen.blit(label_air_density, (10, 140))
-    screen.blit(label_landed_timer, (10, 160))
-    screen.blit(label_gravity, (10, 180))
+
+    screen.blit(label_time2, (24, 24))
+    screen.blit(label_time, (20, 20))
+    screen.blit(label_alt, (20, 60))
+
+    screen.blit(label_rocket_speed_x, (20, 100))
+    screen.blit(label_rocket_speed_y, (20, 120))
+    screen.blit(label_fuel, (20, 160))
+
+
+    screen.blit(label_info1, (20, screeny - 20))
+    screen.blit(label_info2, (130, screeny - 20))
+    screen.blit(label_air_density, (240, screeny - 20))
+    screen.blit(label_TtW, (540, screeny - 20))
+    screen.blit(label_last_time, (680, screeny - 20))
+    screen.blit(label_best_time, (830, screeny - 20))
+    # screen.blit(label_landed_timer, (10, 160))
+
+    if above:
+        screen.blit(label_above, (680, 210))

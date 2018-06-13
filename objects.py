@@ -33,6 +33,7 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
     leg2 = bodies(4, 32, 10000, rocket.posx + rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['pink'], 1)
 
     ground = bodies(ground_w, ground_h, rocket_mass, -rocket_start_pos + ground_w / 2, 100, THECOLORS['red'], 2)
+    ground.body.position = (-rocket_start_pos, -50)
     ground.body._set_moment(pymunk.inf)
 
 
@@ -41,7 +42,7 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
 
             self.pin = pymunk.constraint.PivotJoint(rocket.body, leg.body, pin_coord, (leg.w/2, 0))
 
-            self.rotary = pymunk.constraint.DampedRotarySpring(leg.body, rocket.body, rotary_angle0, 8e9, 6e8)
+            self.rotary = pymunk.constraint.DampedRotarySpring(leg.body, rocket.body, rotary_angle0, 8e9, 2e9)
             self.rotary.collide_bodies = False
 
             self.limit = pymunk.constraint.RotaryLimitJoint(leg.body, rocket.body, limit_angle0,  limit_angle1)
@@ -56,7 +57,7 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
 
     class clouds():
         def __init__(self, number):
-            layers = [8000, 12000, 20000, 32000, 50000, 80000, 120000, 200000]
+            layers = [8000, 12000, 20000, 32000, 50000, 120000, 200000, 250000]
             self.number = number
 
             self.list = []
@@ -78,15 +79,15 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
                 self.imglist[i] = pygame.transform.scale(self.imglist[i], cloud_size)
 
             for i in range(number):
-                rand_layer = random.randint(-2200,2500)
-                self.list.append((random.randint(0, ground.w), random.choice(layers) + rand_layer))
+                rand_layer = random.randint(-2200,2200)
+                self.list.append((random.randint(0, ground_w), random.choice(layers) + rand_layer))
                 self.list[i] = pymunk.pygame_util.to_pygame(self.list[i], screen)
 
                 if len(self.imglist) < number:
                     self.imglist.append(random.choice(self.imglist))
 
 
-    cloud = clouds(2000)
+    cloud = clouds(5000)
 
 
     return(rocket, leg1, leg2, ground, joint1, joint2, rocket_joint, cloud)

@@ -38,10 +38,7 @@ ground_h = 300
 ground_w = 1200000
 
 
-ground_img = pygame.image.load('data/grass.jpg').convert_alpha()
-ground_img = pygame.transform.scale(ground_img, (400, ground_h))
-
-lz_offset = 100000
+lz_offset = 80000
 
 # ---Rocket---
 rocket_fuel_mass_init = 480000
@@ -56,9 +53,22 @@ engine_isp = 800 * 9
 engine_massflow_init = 84
 
 gear = False
+boom = False
+
+display.imageinit(ground_w, ground_h, screenx, screeny)
 
 rocket, leg1, leg2, ground, joint1, joint2, rocket_joint, cloud = objects.begin(
     space, rocket_mass, screenx,screeny, ground_h, ground_w, rocket_start_pos, screen)
+
+with open('scores.dat', 'r') as file:
+    lines = file.readlines()
+
+
+    last_time = lines[0]
+    best_time = lines[1]
+
+lz_size = 3, 0
+isle_number = 3
 
 
 # ---Main Loop---
@@ -68,6 +78,7 @@ while running:
             running = False
         elif event.type == KEYDOWN and event.key == K_ESCAPE:
             running = False
+
 
     # Thrust
     if gear:
@@ -81,7 +92,7 @@ while running:
 
     # CoM calc
     com_init = rocket.h / 2
-    com_end = rocket.h / 3
+    com_end = rocket.h / 4
     rocket_joint.anchor_a = rocket.w/2, (com_end-com_init)/(rocket_empty_mass-950000)*(rocket_mass-950000) + com_init
 
 
@@ -90,34 +101,36 @@ while running:
         rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling, screenx, space, gear)
 
     rocket_fuel_mass, gear = control.keys(
-        space, rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, angle, rocket, joint1, joint2, leg1, leg2, gear)
+        space, rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, angle, rocket, joint1, joint2, leg1, leg2, gear, boom)
 
-    landed, landed_timer, boom, out_map = game.logic(rocket, ground, rocket_pos, lz_offset, space, angle, ceiling)
-    rocket_fuel_mass, landed, gear = game.restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_init ,rocket_fuel_mass, screen, landed, gear)
+    game.score()
+
+    landed, landed_timer, boom, out_map, launched, time, above = game.logic(rocket, ground, rocket_pos, lz_offset, space, angle, ceiling, lz_size, isle_number)
+    rocket_fuel_mass, landed, gear, launched, last_time, best_time = game.restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_init ,rocket_fuel_mass, screen, landed, gear, last_time, best_time)
 
 
     # ---Screen business---
+    lz_size, isle_number = display.graphics(rocket_pos, screen, space, draw_options,
+                     screeny, ground, rocket, ceiling, lz_offset, rocket_start_pos, screenx)
 
-    display.graphics(rocket_pos, screen, space, draw_options,
-                     screeny, ground_img, ground, rocket, ceiling, lz_offset, rocket_start_pos)
-
-    display.GUI(screen, ground, screenx, rocket_pos, ceiling, rocket_start_pos, lz_offset, angle, air_speed_angle, rocket_start_pos)
+    display.GUI(screen, ground, screenx, rocket_pos, ceiling, rocket_start_pos, lz_offset, angle, air_speed_angle, rocket_start_pos, screeny, rocket_fuel_mass_init, rocket_fuel_mass, rocket)
 
     labels.text(screen, rocket, ground, rocket_pos,
-                thrust, gravity, air_density, rocket_start_pos, landed_timer, rocket_empty_mass)
+                thrust, gravity, air_density, rocket_start_pos, landed_timer, rocket_empty_mass, screenx, screeny, time, last_time, best_time, above)
 
-    display.splash(landed, boom, out_map, screen, screenx)
+    display.splash(landed, boom, out_map, screen, screenx, rocket_fuel_mass)
 
     for i in range(cloud.number):
 
         cloudpos = (cloud.list[i][0] - rocket_pos[0], cloud.list[i][1] + rocket_pos[1])
 
-        # FIx clouds
+        # Fix clouds
         if cloud.list[i][0] >= rocket_pos[0] - cloud.max_len and cloud.list[i][0] <= rocket_pos[0] + screenx: # only render visible clouds
             if -cloud.list[i][1] <= rocket_pos[1] + cloud.max_he and -cloud.list[i][1] >= rocket_pos[1] - screeny:
-
                 screen.blit(cloud.imglist[i], cloudpos)
 
+
+    display.infoscreen(screenx, screeny, screen)
 
     # Flip screen
     pygame.display.update()
