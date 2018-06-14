@@ -4,11 +4,10 @@ import math
 import numpy as np
 
 import ISAcalcmod
-import objects
 
 from pygame.locals import *
 
-def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling, screenx, space, gear):
+def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling, screenx, gear):
     angle = pymunk.Body._get_angle(rocket.body)
 
     # Miscellaneous
@@ -60,7 +59,7 @@ def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling
 
     return rocket_pos, rocket_mass, angle, air_density, air_speed_angle, gravity
 
-def keys(space, rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, angle, rocket, joint1, joint2, leg1, leg2, gear, boom):
+def keys(rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, angle, rocket, joint1, joint2, gear, boom):
     keys = pygame.key.get_pressed()
     if keys[K_SPACE] and rocket_fuel_mass - engine_massflow >= 0 and not boom:
 

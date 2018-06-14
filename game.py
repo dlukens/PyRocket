@@ -1,9 +1,9 @@
-import pygame, pymunk, math
+import pygame, math
 from pygame.locals import *
 
 clock = pygame.time.Clock()
 timer = pygame.time.get_ticks
-timeout = 3000 # milliseconds
+timeout = 2000 # milliseconds
 deadline = timer() + timeout
 
 landed = False
@@ -12,9 +12,8 @@ boom = False
 out_map = False
 
 launched = False
-time = 0
 
-def logic(rocket, ground, rocket_pos, lz_offset, space, angle, ceiling, lz_size, isle_number):
+def logic(ground, rocket_pos, lz_offset, space, angle, ceiling, lz_size, isle_number):
     global timeout, deadline, landed, out_map, launched, time, above
     now = timer()
 
@@ -61,14 +60,16 @@ def logic(rocket, ground, rocket_pos, lz_offset, space, angle, ceiling, lz_size,
         if arbiter.shapes[0].id == 2 and arbiter.shapes[1].id == 0:
             if ground.body._get_velocity()[1]/100 >= 20 or not math.radians(25) >= angle >= math.radians(-25):
                 boom = True
+            elif not (lz_offset <= rocket_pos[0] <= lz_offset + lz_size[0] * isle_number) and (ground.w - 12000) >= rocket_pos[0]:
+                boom = True
         return True
 
     handler = space.add_default_collision_handler()
     handler.begin = coll_begin
 
-    return landed, landed_timer, boom, out_map, launched, time, above
+    return landed, boom, out_map, launched, time, above
 
-def restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_init, rocket_fuel_mass, screen, landed, gear, last_time, best_time):
+def restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_init, rocket_fuel_mass, landed, gear, last_time, best_time):
     global launched, boom
     keys = pygame.key.get_pressed()
     if keys[K_r]:

@@ -1,8 +1,8 @@
 import pygame, pymunk, math, random, os
 from pygame.color import *
 
-rocket_h = 32
-rocket_w = 4
+rocket_w = 16
+rocket_h = 128
 
 def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start_pos, screen):
     class bodies():
@@ -28,9 +28,9 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
 
             space.add(self.body, self.shape)
 
-    rocket = bodies(rocket_w*4, rocket_h*4, rocket_mass, screenx/2, ground_h + rocket_h, THECOLORS['blue'], 0)
-    leg1 = bodies(4, 32, 10000, rocket.posx - rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['red'], 1)
-    leg2 = bodies(4, 32, 10000, rocket.posx + rocket.w/2, rocket.posy - 30 - 25/2, THECOLORS['pink'], 1)
+    rocket = bodies(rocket_w, rocket_h, rocket_mass, screenx/2, ground_h + rocket_h, (120, 120, 120, 255), 0)
+    leg1 = bodies(4, 32, 10000, rocket.posx - rocket.w/2, rocket.posy - 30 - 25/2, (80, 80, 80, 255), 1)
+    leg2 = bodies(4, 32, 10000, rocket.posx + rocket.w/2, rocket.posy - 30 - 25/2, (80, 80, 80, 255), 1)
 
     ground = bodies(ground_w, ground_h, rocket_mass, -rocket_start_pos + ground_w / 2, 100, THECOLORS['red'], 2)
     ground.body.position = (-rocket_start_pos, -50)
@@ -87,7 +87,7 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
                     self.imglist.append(random.choice(self.imglist))
 
 
-    cloud = clouds(5000)
+    cloud = clouds(4000)
 
 
-    return(rocket, leg1, leg2, ground, joint1, joint2, rocket_joint, cloud)
+    return(rocket, ground, joint1, joint2, rocket_joint, cloud)
