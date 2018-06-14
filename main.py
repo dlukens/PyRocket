@@ -51,6 +51,8 @@ rocket_mass = rocket_empty_mass + rocket_fuel_mass_init
 engine_isp = 800 * 9
 engine_massflow_init = 84
 
+# Game variables
+
 gear = False
 boom = False
 
@@ -118,12 +120,10 @@ while running:
 
     display.splash(landed, boom, out_map, screen, rocket_fuel_mass, screenx, screeny)
 
-    for i in range(cloud.number):
+    for i in range(cloud.number):# only render visible clouds
 
         cloudpos = (cloud.list[i][0] - rocket_pos[0], cloud.list[i][1] + rocket_pos[1])
 
-        # Fix clouds
-        # only render visible clouds
         if cloud.list[i][0] >= rocket_pos[0] - cloud.max_len and cloud.list[i][0] <= rocket_pos[0] + screenx:
             if -cloud.list[i][1] <= rocket_pos[1] + cloud.max_he and -cloud.list[i][1] >= rocket_pos[1] - screeny:
                 screen.blit(cloud.imglist[i], cloudpos)

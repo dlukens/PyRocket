@@ -7,10 +7,12 @@ import ISAcalcmod
 
 from pygame.locals import *
 
+# Here is everything related to the 'Physics' and control
+
 def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling, screenx, gear):
     angle = pymunk.Body._get_angle(rocket.body)
 
-    # Miscellaneous
+    # Get masses
     rocket_mass = rocket_empty_mass + rocket_fuel_mass
     pymunk.Body._set_mass(rocket.body, rocket_mass)
     pymunk.Body._set_mass(ground.body, rocket_mass)
@@ -27,7 +29,7 @@ def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling
     ground.body.apply_force_at_local_point(
         (0, ground.body._get_mass() * gravity), (0, 0))
 
-    # drag
+    # Drag
     air_density = ISAcalcmod.CALC((rocket_pos[1] * 86000) / (ceiling * 5))
 
     rocket_vel = - \
@@ -60,6 +62,8 @@ def camera(rocket, ground, gravity, rocket_empty_mass, rocket_fuel_mass, ceiling
     return rocket_pos, rocket_mass, angle, air_density, air_speed_angle, gravity
 
 def keys(rocket_fuel_mass, engine_massflow, ground, thrust, force_rcs, angle, rocket, joint1, joint2, gear, boom):
+    # Input controls
+
     keys = pygame.key.get_pressed()
     if keys[K_SPACE] and rocket_fuel_mass - engine_massflow >= 0 and not boom:
 

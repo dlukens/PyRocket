@@ -1,6 +1,8 @@
 import pygame, math
 from pygame.locals import *
 
+# Here everything related to the game aspect happens
+
 clock = pygame.time.Clock()
 timer = pygame.time.get_ticks
 timeout = 2000 # milliseconds
@@ -26,12 +28,14 @@ def logic(ground, rocket_pos, lz_offset, space, angle, ceiling, lz_size, isle_nu
     elif not launched:
         time = 0
 
+    # check if above island
+
     if lz_offset <= rocket_pos[0] <= lz_offset + lz_size[0] * isle_number:
         above = True
     else:
         above = False
 
-    #Landing detection
+    #Landing detection (must stay landed for 2 seconds)
     if math.radians(10) >= angle >= math.radians(-10):
         if rocket_pos[1] <= 100 and lz_offset <= rocket_pos[0] <= lz_offset + lz_size[0] * isle_number:
             if now >= deadline:
@@ -54,7 +58,7 @@ def logic(ground, rocket_pos, lz_offset, space, angle, ceiling, lz_size, isle_nu
     else:
         out_map = False
 
-    #body hit detection
+    #collision detection
     def coll_begin(arbiter, space, data):
         global boom
         if arbiter.shapes[0].id == 2 and arbiter.shapes[1].id == 0:
@@ -71,6 +75,7 @@ def logic(ground, rocket_pos, lz_offset, space, angle, ceiling, lz_size, isle_nu
 
 def restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_init, rocket_fuel_mass, landed, gear, last_time, best_time):
     global launched, boom
+    # what happens when game is restarted
     keys = pygame.key.get_pressed()
     if keys[K_r]:
 
@@ -79,27 +84,29 @@ def restart(rocket_start_pos, ground, rocket, joint1, joint2, rocket_fuel_mass_i
         launched = False
         boom = False
 
-        for i in range(1000): #avoid bug
-            ground.body.position = (-rocket_start_pos, -50)
-            ground.body.velocity = (0, 0)
+        ground.body.position = (-rocket_start_pos, -50)
+        ground.body.velocity = (0, 0)
 
-            rocket.body.angle = 0
-            rocket.body.angular_velocity = 0
+        rocket.body.angle = 0
+        rocket.body.angular_velocity = 0
 
         joint1.rotary._set_rest_angle(-math.pi/4 * 3)
         joint2.rotary._set_rest_angle(0)
+
+
 
         with open('scores.dat', 'r') as file:
             lines = file.readlines()
 
             last_time = lines[0]
             best_time = lines[1]
-
-
+            
         return rocket_fuel_mass_init, False, gear, launched, last_time, best_time
+
     return rocket_fuel_mass, landed, gear, launched, last_time, best_time
 
 def score():
+    # Score (time) management
     if landed:
         with open('scores.dat', 'r') as file:
             lines = file.readlines()

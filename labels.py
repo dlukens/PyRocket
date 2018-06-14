@@ -2,6 +2,8 @@ import pygame
 
 dt = 1 / 60.0
 
+# Here most of the text lables are defined
+
 def text(screen, rocket, ground, rocket_pos, thrust, gravity, air_density, rocket_empty_mass, screeny, time, last_time, best_time, above):
     myfont_small = pygame.font.SysFont("monospace", 18)
     myfont = pygame.font.SysFont("monospace", 20)
@@ -13,8 +15,8 @@ def text(screen, rocket, ground, rocket_pos, thrust, gravity, air_density, rocke
     label_time = myfont_big.render('Time:+{}s'.format(str(time)[:4]), 2, (0, 0, 0))
     label_alt = myfont.render('Altitude: {}km'.format(str(round(rocket_pos[1]/10000, 2))), 2, (0, 0, 0))
     label_TtW = myfont_small.render('T/W: ' + str(round(thrust/(rocket.body._get_mass()*gravity), 2)), 2, (0, 0, 0))
-    label_rocket_speed_x = myfont.render('X Speed: ' + str(round(-ground.body._get_velocity()[0]/100, 0)), 2, (0, 0, 0))
-    label_rocket_speed_y = myfont.render('Y Speed: ' + str(round(-ground.body._get_velocity()[1]/100, 0)), 2, (0, 0, 0))
+    label_rocket_speed_x = myfont.render('X Speed:{} m/s '.format(str(round(-ground.body._get_velocity()[0]/100))), 2, (0, 0, 0))
+    label_rocket_speed_y = myfont.render('Y Speed:{} m/s '.format(str(round(-ground.body._get_velocity()[1]/100))), 2, (0, 0, 0))
     label_air_density = myfont_small.render('Air density:{}kg/m^3'.format(round(air_density, 4)), 2, (0, 0, 0))
 
     label_info1 = myfont_small.render('Airspeed', 2, (0, 0, 0))

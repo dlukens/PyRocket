@@ -1,5 +1,7 @@
 from math import *
 
+# This is a modified version of my ISACalc assignment to find the density
+
 #Constants
 g0 = 9.80665
 R = 287

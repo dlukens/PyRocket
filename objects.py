@@ -1,6 +1,8 @@
 import pygame, pymunk, math, random, os
 from pygame.color import *
 
+# Here physical objects, constraints and the clouds are defined
+
 rocket_w = 16
 rocket_h = 128
 
@@ -42,7 +44,7 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
 
             self.pin = pymunk.constraint.PivotJoint(rocket.body, leg.body, pin_coord, (leg.w/2, 0))
 
-            self.rotary = pymunk.constraint.DampedRotarySpring(leg.body, rocket.body, rotary_angle0, 8e9, 2e9)
+            self.rotary = pymunk.constraint.DampedRotarySpring(leg.body, rocket.body, rotary_angle0, 7e9, 2e9)
             self.rotary.collide_bodies = False
 
             self.limit = pymunk.constraint.RotaryLimitJoint(leg.body, rocket.body, limit_angle0,  limit_angle1)
@@ -56,6 +58,7 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
     space.add(rocket_joint)
 
     class clouds():
+        # From 3 cloud images a list is created and random positions are given across the layers
         def __init__(self, number):
             layers = [8000, 12000, 20000, 32000, 50000, 120000, 200000, 250000]
             self.number = number
@@ -87,7 +90,6 @@ def begin(space, rocket_mass, screenx, screeny, ground_h, ground_w, rocket_start
                     self.imglist.append(random.choice(self.imglist))
 
 
-    cloud = clouds(4000)
-
+    cloud = clouds(4000) #number of clouds
 
     return(rocket, ground, joint1, joint2, rocket_joint, cloud)

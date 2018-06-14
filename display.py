@@ -9,10 +9,12 @@ minimap_rocket_pos_history = [[0, 0], [0, 0]]
 minimap_trail = [[0, 0]]
 minimap_trail_color = [[0, 0, 0]]
 
+# Here everything screen-related is managed
 
 def GUI(screen, ground, screenx, rocket_pos, ceiling, lz_offset, angle, air_speed_angle, lp_offset, screeny, rocket_fuel_mass_init, rocket_fuel_mass, rocket):
     global time
-    # minimap
+
+    # ---minimap---
     size_x = 360
     size_y = 200
     minimap = pygame.Surface((size_x, size_y))
@@ -37,6 +39,7 @@ def GUI(screen, ground, screenx, rocket_pos, ceiling, lz_offset, angle, air_spee
     else:
         trail_color = (30, 220, 220)
 
+    # Rocket trail on minimap
     if round(minimap_rocket_pos_history[-1][0], 1) != round(minimap_rocket_pos_history[-2][0], 1):
         if round(minimap_rocket_pos_history[-1][1], 1) != round(minimap_rocket_pos_history[-2][1], 1):
             minimap_trail.append(minimap_rocket_pos)
@@ -44,9 +47,11 @@ def GUI(screen, ground, screenx, rocket_pos, ceiling, lz_offset, angle, air_spee
 
     for i in range(len(minimap_trail)):
         pygame.draw.rect(minimap, minimap_trail_color[i], (
-            minimap_trail[i][0], size_y - 6 - minimap_trail[i][1], 1, 1))
+            minimap_trail[i][0], size_y - 6 - minimap_trail[i][1], 2, 2))
 
-    minimap_rocket = pygame.draw.rect(minimap, (0, 0, 0), (
+    # minimap drawing
+
+    minimap_rocket = pygame.draw.rect(minimap, (200, 0, 0), (
         minimap_rocket_pos[0], size_y - 6 - minimap_rocket_pos[1], 4, 4))
 
     minimap_lz_pos = round((lz_offset - ground.w/2) * unit_w, 2)
@@ -62,7 +67,6 @@ def GUI(screen, ground, screenx, rocket_pos, ceiling, lz_offset, angle, air_spee
     screen.blit(minimap, (screenx - size_x - 10, 10))
 
     # compass
-
     compass_heading_pos = [round(screenx/2 + 160 * math.sin(-angle)),
                            round(400 - rocket.w/2 - 160 * math.cos(angle))]
     pygame.draw.circle(screen, (0, 255, 0), compass_heading_pos, 5)
@@ -71,7 +75,7 @@ def GUI(screen, ground, screenx, rocket_pos, ceiling, lz_offset, angle, air_spee
                             round(400 - rocket.w/2 - 160 * math.cos(air_speed_angle))]
     pygame.draw.circle(screen, (255, 0, 0), compass_airspeed_pos, 5)
 
-    # Interface
+    # Interface boxes
     pygame.draw.rect(screen, (174, 217, 224), (0, screeny - 20, screenx, 20))
     pygame.draw.rect(screen, (184, 242, 230), (670, screeny - 20, 160, 20))
     pygame.draw.rect(screen, (250, 243, 221), (830, screeny - 20, 200, 20))
@@ -91,6 +95,7 @@ def GUI(screen, ground, screenx, rocket_pos, ceiling, lz_offset, angle, air_spee
 def imageinit(ground_w, ground_h, screenx, screeny):
     global sand_limit, ground_img, sand_list, sand_w, launchpad_img, isle_img, info_img, stars_img, rocket_img, explosion_img, explosion_img_size
 
+    # Images are loaded (once) here
     ground_img = pygame.image.load('data/sand.jpg').convert_alpha()
     ground_img = pygame.transform.scale(ground_img, (2000, ground_h))
 
@@ -121,6 +126,7 @@ def imageinit(ground_w, ground_h, screenx, screeny):
 def graphics(rocket_pos, screen, space, draw_options, screeny, ground, ceiling, lz_offset, lp_offset, screenx, rocket_joint, rocket, angle):
     global lz_pos, lz_size, lp_pos, lp_size, isle_number
 
+    # Background color shift
     sky_color_ground = np.array([87, 197, 241])
     sky_color_space = np.array([48, 31, 93])
 
@@ -147,8 +153,7 @@ def graphics(rocket_pos, screen, space, draw_options, screeny, ground, ceiling, 
 
         # sand
         for i in range(len(sand_list)):
-            sand_pos = pymunk.pygame_util.to_pygame((ground.body._get_position(
-            )[0] + sand_limit[0] + i*sand_w, ground.body._get_position()[1] + ground.h), screen)
+            sand_pos = pymunk.pygame_util.to_pygame((ground.body._get_position()[0] + sand_limit[0] + i*sand_w, ground.body._get_position()[1] + ground.h), screen)
             sand_list[i] = sand_pos
 
             if sand_limit[0] - screenx/2 <= rocket_pos[0] <= sand_limit[1] + screenx/2:  # fix weird pattern
@@ -183,11 +188,10 @@ def graphics(rocket_pos, screen, space, draw_options, screeny, ground, ceiling, 
     if rocket_pos[1] >= 240000:
         screen.blit(stars_img, (0, 0))
 
-
     return lz_size, isle_number
 
-
 def splash(landed, boom, out_map, screen, rocket_fuel_mass, screenx, screeny):
+    # Text that appears when event happens
     def splashy(type, color):
         myfont = pygame.font.SysFont("monospace", 20)
         pygame.draw.rect(screen, color, (350, 20, 240, 100))
@@ -215,6 +219,7 @@ infoshow = True
 
 def infoscreen(screenx, screeny, screen):
     global infoshow
+    # initial information screen
 
     mousepos = pygame.mouse.get_pos()
     mouseclick = pygame.mouse.get_pressed()[0]
